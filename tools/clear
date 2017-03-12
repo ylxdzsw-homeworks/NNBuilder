@@ -1,0 +1,36 @@
+#!/usr/bin/env julia
+
+using ArgParse
+using OhMyJulia
+using RedisAlchemy
+
+const o = let
+    s = ArgParseSettings()
+
+    @add_arg_table s begin
+        "keys"
+            help = "Redis key names"
+            nargs = '*'
+        "--db", "-d"
+            help = "Redis db number, can be 0-15"
+            arg_type = Int
+            default = 0
+        "--all", "-a"
+            help = "clear all keys"
+            nargs = 0
+    end
+
+    parse_args(s) |> to_module
+end
+
+conn = RedisConnection(db=o.db)
+
+if o.all
+    exec(conn, "flushdb")
+    println("all clear")
+else
+    n = mapreduce(+, 0, o.keys) do key
+        exec(conn, "del", key)
+    end
+    println("deleted $n key(s)")
+end

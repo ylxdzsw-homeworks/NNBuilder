@@ -1,0 +1,13 @@
+doctype html
+html
+    head
+        meta(charset="utf8")
+        title $id | joinview
+        link(rel="stylesheet", href="/static/main.css")
+        script(src="/static/jquery.js")
+        script(src="/static/main.js")
+        script.
+            app = {id: "$id"}
+    body
+        pre#content
+        pre#history
