@@ -18,15 +18,13 @@ gulp.task('views', ['styles', 'scripts'],function(){
 })
 
 gulp.task('styles', function() {
-    return gulp.src('src/*.less')
+    return gulp.src('src/*.scss')
         .pipe($.plumber())
-        .pipe($.less()
+        .pipe($.sass()
             .on('error', $.util.log))
-        .pipe($.postcss([
-                require('autoprefixer-core')({
-                    browsers: ['> 1%', 'last 2 versions']
-                })
-            ]))
+        .pipe($.autoprefixer({
+            browsers: ['last 2 versions']
+        }))
         .pipe($.if(production, $.minifyCss()))
         .pipe(gulp.dest('build'))
 })
@@ -56,7 +54,7 @@ gulp.task('browser-sync', function() {
 })
 
 gulp.task('watch', ['build'], function() {
-    gulp.watch('src/*.less', ['views'])
+    gulp.watch('src/*.scss', ['views'])
     gulp.watch('src/*.jade', ['views'])
     gulp.watch('src/*.coffee', ['views'])
 
@@ -64,7 +62,7 @@ gulp.task('watch', ['build'], function() {
 })
 
 gulp.task('clean', function(cb) {
-    del(['build'], cb)
+    del(['build']).then(paths => cb())
 })
 
 gulp.task('build', ['views', 'lib'], function() {

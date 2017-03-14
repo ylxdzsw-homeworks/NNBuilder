@@ -3,16 +3,24 @@ const db_models = RedisList{String}("models")
 @resource models <: root let
     :mixin => defaultmixin
 
-    :GET | json => begin
-        @destruct project
+    :GET => begin
+        if !("project" in keys(req[:query]))
+            return 400
+        end
+
+        project = try
+             parse(Int, req[:query]["project"])
+        catch
+            return 400
+        end
 
         models = db_models[:]
 
-        if "all" in req[:body] && req[:body]["all"]
-            idx = find(x->JSON.parse(x)["project"]==project, model)
+        if get(req[:query], "all", false)
+            idx = find(x->JSON.parse(x)["project"]==project, models)
             isempty(idx) ? 404 : "[$(join(models[idx], ','))]"
         else
-            idx = findlast(x->JSON.parse(x)["project"]==project, model)
+            idx = findlast(x->JSON.parse(x)["project"]==project, models)
             idx == 0 ? 404 : models[idx]
         end
     end
