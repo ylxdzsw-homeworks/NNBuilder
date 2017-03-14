@@ -1,20 +1,5 @@
 #!/usr/bin/env julia
-using OhMyJulia
-using HttpServer
-using RedisAlchemy
-using Restful
-using Restful: json, cors, staticserver, render
-
-const conn = RedisConnectionPool()
-
-@resource root let
-    :mixin => defaultmixin
-    :onreturn => cors
-end
-
-include(rel"redis_proxy.jl")
-include(rel"static_assets.jl")
-include(rel"view_page.jl")
+include("../server/web/main.jl")
 
 @async run(Server(root), host=ip"0.0.0.0", port=try parse(Int, ARGS[1]) catch 8000 end)
 

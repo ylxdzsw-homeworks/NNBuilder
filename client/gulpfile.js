@@ -47,9 +47,11 @@ gulp.task('lib', function() {
 
 gulp.task('browser-sync', function() {
     browserSync({
-        server: {
-            baseDir: './build'
-        }
+        proxy: 'localhost:8000',
+        serveStatic: [{
+            route: ['/', '/static'],
+            dir: './build'
+        }]
     })
 })
 
