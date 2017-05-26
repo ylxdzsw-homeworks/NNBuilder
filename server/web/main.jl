@@ -1,4 +1,3 @@
-using OhMyJulia
 using HttpServer
 using RedisAlchemy
 using Restful
@@ -21,5 +20,6 @@ end
 
 include("util.jl")
 include("static_assets.jl")
+include("redis_proxy.jl")
 include("projects.jl")
 include("models.jl")
