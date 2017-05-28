@@ -5,6 +5,9 @@ using JSON
 using JsonBuilder
 using Restful: json, cors, staticserver, render
 
+include("../util/language_extension.jl")
+include("util.jl")
+
 set_default_redis_connection(RedisConnectionPool())
 
 const db_uid = RedisCounter("uid")
@@ -14,11 +17,10 @@ const db_uid = RedisCounter("uid")
     :onreturn => cors
 
     :GET => begin
-        open(readstring, rel"../../client/build/main.html")
+        open(readstring, abs"client/build/main.html")
     end
 end
 
-include("util.jl")
 include("static_assets.jl")
 include("redis_proxy.jl")
 include("projects.jl")

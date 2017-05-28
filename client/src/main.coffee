@@ -5,85 +5,34 @@ newProject = (name) ->
         .fail showError
         .done (data) ->
             id = JSON.parse(data).id
-            app.project = id
+            app.project = {id, name}
             app.model = do newModel
+            do saveCheckPoint
             do navModel
+            $('#dialog-new-project').modal 'hide'
 
 newModel = ->
-    {
-        "version": 1,
-        "name": "MNIST Example",
-        "project": 1,
-        "backend": "keras",
-        "layers": [{
-            "type": "BatchInput",
-            "name": "input1",
-            "outshape": [28, 28, 1]
-        }, {
-            "type": "Convolution",
-            "name": "conv1",
-            "in": "input1",
-            "filter": [3, 3],
-            "stride": [1, 1],
-            "n_filter": 64,
-            "plugins": [{
-                "type": "Activation",
-                "function": "ReLU"
-            }]
-        }, {
-            "type": "Pooling",
-            "name": "pool1",
-            "in": "conv1",
-            "function": "max",
-            "filter": [2, 2],
-            "stride": [2, 2]
-        }, {
-            "type": "Convolution",
-            "name": "conv2",
-            "in": "pool1",
-            "filter": [3, 3],
-            "stride": [1, 1],
-            "n_filter": 64,
-            "plugins": [{
-                "type": "Activation",
-                "function": "ReLU"
-            }]
-        }, {
-            "type": "Pooling",
-            "name": "pool2",
-            "in": "conv2",
-            "function": "max",
-            "filter": [2, 2],
-            "stride": [2, 2]
-        }, {
-            "type": "Flatten",
-            "name": "flat1",
-            "in": "pool2"
-        }, {
-            "type": "InnerProduct",
-            "name": "fc1",
-            "in": "flat1",
-            "plugins": [{
-                "type": "Activation",
-                "function": "Sigmoid"
-            }]
-        }, {
-            "type": "Softmax",
-            "name": "output"
-        }],
-        "train": {
-            "n_epoch": "15",
-            "batch_size": "64",
-            "loss": "categorical_crossentropy",
-            "metrics": ["accuracy"],
-            "optimizer": {
-                "type": "SGD",
-                "lr": 0.01,
-                "decay": 1e-6,
-                "momentum": 0.9
-            }
-        }
-    }
+    version: 1
+    project: app.project.id
+    backend: 'keras'
+    process: []
+    layers: []
+    train:
+        epoch: 5
+        batch: 64
+        loss: 'categorical_crossentropy'
+        metrics: ['accuracy']
+        optimizer:
+            type: 'SGD'
+            lr: 0.1
+
+saveCheckPoint = (cb=->) ->
+    if not app.model?
+        return #TODO
+
+    $.post url: "/models", data: JSON.stringify app.model
+        .fail showError
+        .done cb
 
 navModel = ->
     if not app.model?
@@ -91,8 +40,7 @@ navModel = ->
 
     $('.nav>li').removeClass 'active'
     $('#nav-model').addClass 'active'
-    $('#main').html null
-    $('#dialog-new-project').modal 'hide'
+    do loadCanvasFramework
 
 navData = ->
     if not app.model?
@@ -139,14 +87,20 @@ onLoadProjectShow = ->
         .done (data) ->
             JSON.parse data
                 .forEach ({id, name}) ->
-                    $ "<button class='list-group-item' data-id='#{id}'>#{name}</button>"
+                    $ "<button class='list-group-item' data-id='#{id}' data-name='#{name}'>#{name}</button>"
                         .click onProjectSelected
                         .appendTo '#dialog-load-project-list'
 
 onProjectSelected = ->
     id = $(@).data 'id'
-    app.project = id
+    name = $(@).data 'name'
+    app.project = {id, name}
     $.get url: '/models', data: project: id
+        .fail showError
+        .done (data) ->
+            app.model = JSON.parse data
+            do navModel
+            $('#dialog-load-project').modal 'hide'
 
 $ ->
     $('#dialog-new-project-submit').click onNewProjectSubmit

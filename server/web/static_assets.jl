@@ -1,3 +1,3 @@
 @resource static <: root let
-    :onroute => staticserver(rel"../client/build")
+    :onroute => staticserver(abs"client/build")
 end

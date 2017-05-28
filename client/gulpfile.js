@@ -6,13 +6,10 @@ const $           = require('gulp-load-plugins')()
 
 let production = true
 
-gulp.task('views', ['styles', 'scripts'],function(){
+gulp.task('views', ['styles', 'scripts'], function() {
     return gulp.src(['src/*.jade'])
         .pipe($.plumber())
-        .pipe($.jade({
-            pretty: !production
-        }))
-        .on('error', $.util.log)
+        .pipe($.jade({pretty: !production}).on('error', $.util.log))
         .pipe(gulp.dest('build'))
         .pipe(browserSync.reload({stream: true}))
 })
@@ -20,11 +17,8 @@ gulp.task('views', ['styles', 'scripts'],function(){
 gulp.task('styles', function() {
     return gulp.src('src/*.scss')
         .pipe($.plumber())
-        .pipe($.sass()
-            .on('error', $.util.log))
-        .pipe($.autoprefixer({
-            browsers: ['last 2 versions']
-        }))
+        .pipe($.sass().on('error', $.util.log))
+        .pipe($.autoprefixer({browsers: ['last 2 versions']}))
         .pipe($.if(production, $.minifyCss()))
         .pipe(gulp.dest('build'))
 })
@@ -32,9 +26,10 @@ gulp.task('styles', function() {
 gulp.task('scripts', function() {
     return gulp.src('src/*.coffee')
         .pipe($.plumber())
-        .pipe($.coffee())
-        .on('error', $.util.log)
+        .pipe($.if(!production, $.sourcemaps.init()))
+        .pipe($.coffee({bare: true}).on('error', $.util.log))
         .pipe($.if(production, $.uglify()))
+        .pipe($.if(!production, $.sourcemaps.write()))
         .pipe(gulp.dest('build'))
 })
 

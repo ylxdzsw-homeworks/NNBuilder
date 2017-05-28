@@ -20,9 +20,9 @@ const f64 = Float64
 
 @inline void(x::ANY...) = nothing
 
-const project_root = joinpath(Base.source_dir(), "..")
+const project_root = normpath(Base.source_dir(), "..", "..")
 
-macro abs_str(x) isinteractive() ? x : joinpath($project_root, split(x, '/')...) end
+macro abs_str(x) isinteractive() ? x : joinpath(project_root, split(x, '/')...) end
 
 import Base: <<, >>, >>>
 

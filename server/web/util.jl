@@ -9,3 +9,14 @@ macro destruct(x...)
     end
     result
 end
+
+@mixin debug begin
+    :onroute => function (r, req, id)
+        @show now() id
+        println("req = ", JSON.json(req, 2))
+    end
+
+    :onresponse => function (r, req, id, res)
+        @show now() res
+    end
+end
