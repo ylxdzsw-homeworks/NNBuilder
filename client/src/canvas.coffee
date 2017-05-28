@@ -37,7 +37,7 @@ renderLayer = (layer) ->
             </div>
             <ol class="output-list">
                 #{
-                    ("<li class='output-item' data-index='#{i}'></li>" for i in [0...def.output]).join('')
+                    ("<li class='output-item total-#{def.output}' data-index='#{i}'></li>" for i in [0...def.output]).join('')
                 }
             </ol>
         </div>

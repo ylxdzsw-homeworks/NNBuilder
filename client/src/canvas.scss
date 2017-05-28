@@ -8,6 +8,7 @@
 .toolbox-item {
     float: left;
     width: 50%;
+    padding: 20px 0;
     text-align: center;
 }
 
@@ -15,11 +16,69 @@
     display: inline-block;
     width: 80px;
 
-    .input-list {
-        margin: 0;
+    .body {
+        border: solid #222 1px;
+        border-radius: 4px;
+
+        .body-name {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .plugin-list {
+            margin: 0;
+            padding: 0;
+        }
     }
 
-    li {
-        display: block
+    .input-list {
+        margin: 0;
+        padding: 0;
+
+        .input-item {
+            display: block;
+            float: left;
+            width: 8px;
+            height: 10px;
+            background-image: url("/static/pin.svg");
+
+            @for $i from 1 through 4 {
+                &.total-#{$i} {
+                   margin-left: (80px - $i * 8px) / ($i + 1);
+                }
+            }
+        }
+
+        &::after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+    }
+
+    .output-list {
+        margin: 0;
+        padding: 0;
+
+        .output-item {
+            display: block;
+            float: left;
+            width: 8px;
+            height: 10px;
+            background-image: url("/static/pin.svg");
+            transform: scaleY(-1);
+
+            @for $i from 1 through 4 {
+                &.total-#{$i} {
+                   margin-left: (80px - $i * 8px) / ($i + 1);
+                }
+            }
+        }
+
+        &::after {
+            content: "";
+            display: table;
+            clear: both;
+        }
     }
 }
