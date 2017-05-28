@@ -39,6 +39,19 @@ layerInfo =
         input: 1
         output: 1
         params: {}
+    Input:
+        input: 0
+        output: 1
+        params:
+            index:
+                description: "the index of the input"
+                type: 'integer'
+                check: (x) ->
+                    return "input index must be positive" if x < 0
+    Output:
+        input: 1
+        output: 0
+        params: {}
 
 getLayerList = -> k for k of layerInfo
 

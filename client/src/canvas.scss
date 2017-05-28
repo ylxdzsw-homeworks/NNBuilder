@@ -1,8 +1,10 @@
 .toolbox {
     float: left;
-    width: 200px;
-    height: 100%;
+    width: 220px;
+    height: calc(100vh - 52px);
     overflow-y: auto;
+    border-right: solid #e7e7e7 1px;
+    background-color: #f8f8f8;
 }
 
 .toolbox-item {
@@ -12,6 +14,14 @@
     text-align: center;
 }
 
+.canvas {
+    position: relative;
+    float: left;
+    width: calc(100vw - 220px);
+    height: calc(100vh - 52px);
+    overflow-y: auto;
+}
+
 .node {
     display: inline-block;
     width: 80px;
@@ -19,6 +29,7 @@
     .body {
         border: solid #222 1px;
         border-radius: 4px;
+        padding: 8px 4px;
 
         .body-name {
             margin: 0;
@@ -34,6 +45,13 @@
     .input-list {
         margin: 0;
         padding: 0;
+        height: 10px;
+
+        @for $i from 1 through 4 {
+            &.total-#{$i} .input-item {
+                margin-left: (80px - $i * 8px) / ($i + 1);
+            }
+        }
 
         .input-item {
             display: block;
@@ -41,12 +59,6 @@
             width: 8px;
             height: 10px;
             background-image: url("/static/pin.svg");
-
-            @for $i from 1 through 4 {
-                &.total-#{$i} {
-                   margin-left: (80px - $i * 8px) / ($i + 1);
-                }
-            }
         }
 
         &::after {
@@ -59,6 +71,13 @@
     .output-list {
         margin: 0;
         padding: 0;
+        height: 10px;
+
+        @for $i from 1 through 4 {
+            &.total-#{$i} .output-item {
+                margin-left: (80px - $i * 8px) / ($i + 1);
+            }
+        }
 
         .output-item {
             display: block;
@@ -67,12 +86,6 @@
             height: 10px;
             background-image: url("/static/pin.svg");
             transform: scaleY(-1);
-
-            @for $i from 1 through 4 {
-                &.total-#{$i} {
-                   margin-left: (80px - $i * 8px) / ($i + 1);
-                }
-            }
         }
 
         &::after {
@@ -81,4 +94,17 @@
             clear: both;
         }
     }
+}
+
+.level {
+    height: 100px;
+    margin: 0;
+    padding: 20px;
+}
+
+.dragging-overlay {
+    position: absolute;
+    height: 120px;
+    border-right: dashed #ddd 1px;
+    border-bottom: dashed #ddd 1px;
 }
