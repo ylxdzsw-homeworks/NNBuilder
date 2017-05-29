@@ -105,11 +105,17 @@
 
 .dragging-overlay {
     position: absolute;
-    height: 120px;
+    height: 100px;
     border-right: dashed #ddd 1px;
     border-bottom: dashed #ddd 1px;
+    z-index: 100;
 
     &.active {
-        border-color: #e22;
+        background-color: rgba(200, 255, 200, 0.4);
     }
+}
+
+.cell {
+    display: inline-block;
+    padding: 0 20px;
 }

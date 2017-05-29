@@ -13,25 +13,29 @@ fillToolbox = ->
 
         node = renderNode layer, input, output, layer
             .on 'dragstart', onToolboxLayerDragStart
-            .on 'dragend', onToolboxLayerDragEnd
 
         $("<div class='toolbox-item'></div>")
             .append node
             .appendTo $('.toolbox')
 
 onToolboxLayerDragStart = (e) ->
-    e.originalEvent.dataTransfer.setData 'text/plain', $(@).data 'id'
+    e.originalEvent.dataTransfer.setData 'application/json', JSON.stringify {type: $(@).data 'id'}
     do triggerDraggingOverlay
 
-onToolboxLayerDragEnd = (e) ->
-    do destroyDraggingOverlay
-
 onOverlayDrop = (e) ->
-    layer = {type: e.originalEvent.dataTransfer.getData 'text'}
-    makeIdFor layer
+    data = JSON.parse e.originalEvent.dataTransfer.getData 'application/json'
+    layer = switch
+        when data.id?
+            app.canvas.layers[data.id]
+        when data.type?
+            makeIdFor data
+        else
+            throw "fuck"
+
     {input, output} = getLayerInfo layer.type
     app.canvas.layers[layer.id] = layer
     node = renderNode layer.type, input, output, layer.id
+        .on 'dragstart', onCanvasLayerDragStart
 
     {row, col} = do $(@).data
 
@@ -43,10 +47,48 @@ onOverlayDrop = (e) ->
         $('.canvas').append level
         app.canvas.positions.push [layer.id]
     else
-        $("<div class='cell'></div>")
-            .append node
-        app.canvas.positions[row][col]
-        #TODO
+        level = $('.canvas > .level').eq row
+        cells = $('.cell', level)
+        if col == cells.length
+            $("<div class='cell'></div>")
+                .append node
+                .appendTo level
+        else
+            $("<div class='cell'></div>")
+                .append node
+                .insertBefore cells.eq col
+        app.canvas.positions[row].splice col, 0, layer.id
+
+    do destroyDraggingOverlay
+    do clearDeadLayers
+
+onCanvasLayerDragStart = (e) ->
+    id = $(@).data 'id'
+    e.originalEvent.dataTransfer.setData 'application/json', JSON.stringify {id}
+    setImmediate ->
+        removeLayerById id
+
+        do triggerDraggingOverlay
+
+removeLayerById = (id) ->
+    for i in [0...app.canvas.positions.length]
+        for j in [0...app.canvas.positions[i].length]
+            if app.canvas.positions[i][j] == id
+                return if app.canvas.positions[i].length == 1
+                    app.canvas.positions.splice i, 1
+                    do $(".canvas > .level").eq(i).remove
+                else
+                    app.canvas.positions[i].splice j, 1
+                    do $(".canvas > .level:eq(#{i}) > .cell").eq(j).remove
+    #TODO: remove connections
+
+setImmediate = (cb) ->
+    setTimeout cb, 4
+
+clearDeadLayers = ->
+    set = [].concat(app.canvas.positions...)
+    for k of app.canvas.layers
+        delete app.canvas.layers[k] if k not in set
 
 makeIdFor = do ->
     str = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -64,25 +106,53 @@ onOverlayDragEnter = (e) ->
 onOverlayDragLeave = (e) ->
     $(e.currentTarget).removeClass 'active'
 
-triggerDraggingOverlay = ->
-    lines = $('.canvas>.level')
-
-    newRow = $("<div></div>")
+renderOverlay = ->
+    $("<div></div>")
         .addClass 'dragging-overlay'
-        .data 'row', lines.length
-        .data 'col', 0
         .on 'drop', onOverlayDrop
         .on 'dragover', preventDefault
         .on 'dragenter', onOverlayDragEnter
         .on 'dragleave', onOverlayDragLeave
+
+triggerDraggingOverlay = ->
+    lines = $('.canvas>.level')
+
+    for i in [0...lines.length]
+        left = 0
+        cells = $('.cell', lines[i])
+
+        for j in [0...cells.length]
+            cell = cells.eq j
+            right = cell.position().left + cell.innerWidth() / 2
+            renderOverlay()
+                .data 'row', i
+                .data 'col', j
+                .css
+                    top: 100 * i
+                    left: left
+                    width: right - left
+                .appendTo lines[i]
+            left = right
+
+        renderOverlay()
+            .data 'row', i
+            .data 'col', j
+            .css
+                top: 100 * i
+                left: left
+                width: $('.canvas').width() - left
+                borderRight: 'none'
+            .appendTo lines[i]
+
+    renderOverlay()
+        .data 'row', lines.length
+        .data 'col', 0
         .css
-            top: 120 * lines.length
+            top: 100 * lines.length
             left: 0
             width: '100%'
-            borderBottom: 'none'
-
-    $('.canvas')
-        .append newRow
+            border: 'none'
+        .appendTo $('.canvas')
 
 destroyDraggingOverlay = ->
     do $('.dragging-overlay').remove
