@@ -1,12 +1,5 @@
 <svg width="8" height="10" xmlns="http://www.w3.org/2000/svg">
  <g>
-  <title>background</title>
-  <rect x="-1" y="-1" width="10" height="12" id="canvas_background" fill="transparent"/>
-  <g id="canvasGrid" display="none">
-   <rect id="svg_2" width="100%" height="100%" x="0" y="0" stroke-width="0" fill="url(#gridpattern)"/>
-  </g>
- </g>
- <g>
   <title>Layer 1</title>
   <ellipse fill="#fff" stroke="#000" stroke-width="1.5" cx="4" cy="2" id="svg_1" rx="2" ry="2"/>
   <line stroke-linecap="null" stroke-linejoin="null" id="svg_3" y2="10" x2="4" y1="4" x1="4" fill-opacity="null" stroke-opacity="null" stroke-width="1.5" stroke="#000" fill="none"/>

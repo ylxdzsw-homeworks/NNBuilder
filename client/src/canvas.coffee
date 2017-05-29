@@ -4,13 +4,14 @@ loadCanvasFramework = ->
         <div class="canvas"></div>
     """
 
+    app.canvas = app.model.model
     do fillToolbox
 
 fillToolbox = ->
     for layer in do getLayerList
         {input, output} = getLayerInfo layer
 
-        node = renderNode layer, input, output
+        node = renderNode layer, input, output, layer
             .on 'dragstart', onToolboxLayerDragStart
             .on 'dragend', onToolboxLayerDragEnd
 
@@ -18,19 +19,62 @@ fillToolbox = ->
             .append node
             .appendTo $('.toolbox')
 
-
 onToolboxLayerDragStart = (e) ->
-    e.originalEvent.dataTransfer.setData 'text/plain', e.target.dataset.name
+    e.originalEvent.dataTransfer.setData 'text/plain', $(@).data 'id'
     do triggerDraggingOverlay
 
 onToolboxLayerDragEnd = (e) ->
     do destroyDraggingOverlay
+
+onOverlayDrop = (e) ->
+    layer = {type: e.originalEvent.dataTransfer.getData 'text'}
+    makeIdFor layer
+    {input, output} = getLayerInfo layer.type
+    app.canvas.layers[layer.id] = layer
+    node = renderNode layer.type, input, output, layer.id
+
+    {row, col} = do $(@).data
+
+    if row == app.canvas.positions.length
+        cell = $("<div class='cell'></div>")
+            .append node
+        level = $("<div class='level'></div>")
+            .append cell
+        $('.canvas').append level
+        app.canvas.positions.push [layer.id]
+    else
+        $("<div class='cell'></div>")
+            .append node
+        app.canvas.positions[row][col]
+        #TODO
+
+makeIdFor = do ->
+    str = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    gen = (prefix) -> prefix + '_' + (str[Math.floor(Math.random() * str.length)] for i in [1..5]).join('')
+    (layer) ->
+        loop
+            id = gen layer.type
+            if id not of app.model.model.layers and id not of app.model.processing.layers
+                layer.id = id
+                return layer
+
+onOverlayDragEnter = (e) ->
+    $(e.currentTarget).addClass 'active'
+
+onOverlayDragLeave = (e) ->
+    $(e.currentTarget).removeClass 'active'
 
 triggerDraggingOverlay = ->
     lines = $('.canvas>.level')
 
     newRow = $("<div></div>")
         .addClass 'dragging-overlay'
+        .data 'row', lines.length
+        .data 'col', 0
+        .on 'drop', onOverlayDrop
+        .on 'dragover', preventDefault
+        .on 'dragenter', onOverlayDragEnter
+        .on 'dragleave', onOverlayDragLeave
         .css
             top: 120 * lines.length
             left: 0
@@ -52,9 +96,9 @@ destroyDraggingOverlay = ->
 #       li.node-plugin-item
 #   ol.node-output-list
 #     li.node-output-item
-renderNode = (name, input, output) ->
+renderNode = (name, input, output, id) ->
     $ """
-        <div class="node" draggable="true" data-name="#{name}">
+        <div class="node" draggable="true" data-id="#{id}">
             <ol class="input-list total-#{input}">
                 #{
                     ("<li class='input-item' data-index='#{i}'></li>" for i in [0...input]).join('')

@@ -100,6 +100,7 @@
     height: 100px;
     margin: 0;
     padding: 20px;
+    text-align: center;
 }
 
 .dragging-overlay {
@@ -107,4 +108,8 @@
     height: 120px;
     border-right: dashed #ddd 1px;
     border-bottom: dashed #ddd 1px;
+
+    &.active {
+        border-color: #e22;
+    }
 }

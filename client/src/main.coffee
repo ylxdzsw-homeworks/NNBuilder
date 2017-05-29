@@ -15,8 +15,14 @@ newModel = ->
     version: 1
     project: app.project.id
     backend: 'keras'
-    process: []
-    layers: []
+    model:
+        layers: []
+        positions: []
+        connections: []
+    processing:
+        layers: []
+        positions: []
+        connections: []
     train:
         epoch: 5
         batch: 64
@@ -72,6 +78,9 @@ showToast = do ->
 showError = (e) ->
     showToast e.msg, 'danger'
 
+preventDefault = (e) ->
+    do e.preventDefault
+
 onNewProjectSubmit = ->
     name = $('#dialog-new-project-name').val()
     if name.trim() == ""
@@ -92,8 +101,7 @@ onLoadProjectShow = ->
                         .appendTo '#dialog-load-project-list'
 
 onProjectSelected = ->
-    id = $(@).data 'id'
-    name = $(@).data 'name'
+    {id, name} = do $(@).data
     app.project = {id, name}
     $.get url: '/models', data: project: id
         .fail showError
