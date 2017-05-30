@@ -16,11 +16,11 @@ newModel = ->
     project: app.project.id
     backend: 'keras'
     model:
-        layers: []
+        layers: {}
         positions: []
         connections: []
     processing:
-        layers: []
+        layers: {}
         positions: []
         connections: []
     train:
@@ -80,6 +80,9 @@ showError = (e) ->
 
 preventDefault = (e) ->
     do e.preventDefault
+
+stopPropagation = (e) ->
+    do e.stopPropagation
 
 onNewProjectSubmit = ->
     name = $('#dialog-new-project-name').val()

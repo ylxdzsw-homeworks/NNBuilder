@@ -1,0 +1,16 @@
+.node {
+    .input-list .input-item {
+        z-index: 4;
+    }
+    .output-list .output-item {
+        z-index: 4;
+    }
+}
+
+.dragging-overlay {
+    z-index: 8;
+}
+
+.canvas_background {
+    z-index: -8;
+}
