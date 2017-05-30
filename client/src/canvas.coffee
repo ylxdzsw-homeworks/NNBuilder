@@ -254,8 +254,8 @@ renderConnections = ->
         y2 = outputTop - refTop + 8
         """<line x1="#{x1}" x2="#{x2}" y1="#{y1}" y2="#{y2}" stroke-width="1.5" stroke="#000" />"""
 
-    $('.canvas_background').height do $('.canvas').height
     $('.canvas_background').width do $('.canvas').width
+    $('.canvas_background').height $('.canvas').prop 'scrollHeight'
     $('.canvas_background').html """
         <g>
             <title> fuck </title>
