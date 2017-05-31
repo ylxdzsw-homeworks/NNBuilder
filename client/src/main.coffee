@@ -120,3 +120,5 @@ $ ->
     $('#nav-model').click navModel
     $('#nav-data').click navData
     $('#nav-train').click navTrain
+
+    $('#nav-menu-save').click -> saveCheckPoint -> showToast "保存成功"

@@ -12,6 +12,8 @@ loadCanvasFramework = ->
 
     app.canvas = app.model.model
     do fillToolbox
+    do fillCanvasNodes
+    do renderConnections
 
 fillToolbox = ->
     for layer in do getLayerList
@@ -24,6 +26,40 @@ fillToolbox = ->
         $("<div class='toolbox-item'></div>")
             .append node
             .appendTo $('.toolbox')
+
+fillCanvasNodes = ->
+    for level in app.canvas.positions
+        line = $("<div class='level'></div>")
+
+        for layer in level
+            layer = app.canvas.layers[layer]
+            {input, output} = getLayerInfo layer.type
+
+            node = renderNode layer.type, input, output, layer.id
+                .on 'dragstart', onCanvasLayerDragStart
+                .on 'dblclick', onCanvasNodeDoubleClick
+
+            $('.input-item', node)
+                .on 'dragstart', stopPropagation
+                .on 'dragstart', onInputPinDragStart
+                .on 'dragend', stopPropagation
+                .on 'dragend', onInputPinDragEnd
+                .on 'dragover', preventDefault
+                .on 'drop', onInputPinDrop
+
+            $('.output-item', node)
+                .on 'dragstart', stopPropagation
+                .on 'dragstart', onOutputPinDragStart
+                .on 'dragend', stopPropagation
+                .on 'dragend', onOutputPinDragEnd
+                .on 'dragover', preventDefault
+                .on 'drop', onOutputPinDrop
+
+            $("<div class='cell'></div>")
+                .append node
+                .appendTo line
+
+        $('.canvas').append line
 
 onToolboxLayerDragStart = (e) ->
     e.originalEvent.dataTransfer.setData 'application/json', JSON.stringify {type: $(@).data 'id'}
@@ -369,6 +405,7 @@ parseType = (type, value) ->
             value = value.map (x) -> parseInt x
 
     value
+
 $ ->
     $('#dialog-set-param-submit').click onSetParamSubmit
     $("#dialog-set-param input").on 'focus', onSetParamFieldFocus
