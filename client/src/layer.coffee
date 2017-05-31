@@ -56,3 +56,5 @@ layerInfo =
 getLayerList = -> k for k of layerInfo
 
 getLayerInfo = (name) -> layerInfo[name] ? throw "no such a layer: #{name}"
+
+getLayerParams = (name) -> layerInfo[name]?.params ? throw "no such a layer: #{name}"

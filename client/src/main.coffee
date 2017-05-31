@@ -120,4 +120,3 @@ $ ->
     $('#nav-model').click navModel
     $('#nav-data').click navData
     $('#nav-train').click navTrain
-

@@ -60,6 +60,18 @@ html
                     .modal-footer
                         button.btn.btn-default(type='button', data-dismiss='modal') 返回
 
+        #dialog-set-param.modal.fade
+            .modal-dialog
+                .modal-content
+                    .modal-header
+                        button.close(data-dismiss='modal') &times;
+                        h4.modal-title
+                    .modal-body
+                        form.form-horizontal
+                    .modal-footer
+                        button.btn.btn-default(type='button', data-dismiss='modal') 取消
+                        button#dialog-set-param-submit.btn.btn-primary(type='button') 确定
+
         #main
             button#init-new.btn.btn-primary(data-toggle='modal', data-target='#dialog-new-project') new proj
             button#init-load.btn.btn-secondary(data-toggle='modal', data-target='#dialog-load-project') select proj

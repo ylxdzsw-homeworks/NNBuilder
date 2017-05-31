@@ -43,6 +43,7 @@ onOverlayDrop = (e) ->
     app.canvas.layers[layer.id] = layer
     node = renderNode layer.type, input, output, layer.id
         .on 'dragstart', onCanvasLayerDragStart
+        .on 'dblclick', onCanvasNodeDoubleClick
 
     $('.input-item', node)
         .on 'dragstart', stopPropagation
@@ -262,3 +263,112 @@ renderConnections = ->
             #{lines.join("\n  ")}
         </g>
     """
+
+onCanvasNodeDoubleClick = ->
+    layer = app.canvas.layers[$(@).data 'id']
+
+    do $('#dialog-set-param form').empty
+
+    for name, def of getLayerParams layer.type
+        renderParam name, def, layer[name]
+            .appendTo $('#dialog-set-param form')
+
+    $('#dialog-set-param')
+        .data 'id', layer.id
+        .modal()
+
+renderParam = (name, def, value='') ->
+    param = $ switch def.type
+        when 'integer'
+            """
+                <div class="form-group">
+                    <label class="col-sm-2 control-label" for="#{name}">#{name}</label>
+                    <div class="col-sm-9">
+                        <input type="number" step="1" class="form-control" id="#{name}" value="#{value}" />
+                    </div>
+                </div>
+            """
+        when 'size'
+            """
+                <div class="form-group">
+                    <label class="col-sm-2 control-label" for="#{name}">#{name}</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" id="#{name}" value="#{value}" />
+                    </div>
+                </div>
+            """
+        when 'number'
+            """
+                <div class="form-group">
+                    <label class="col-sm-2 control-label" for="#{name}">#{name}</label>
+                    <div class="col-sm-9">
+                        <input type="number" class="form-control" id="#{name}" value="#{value}" />
+                    </div>
+                </div>
+            """
+        else
+            throw 'bug' if not def.type.startsWith 'enum: '
+
+            """
+                <div class="form-group">
+                    <label class="col-sm-2 control-label" for="#{name}">#{name}</label>
+                    <div class="col-sm-9">
+                        <select class="form-control" id="#{name}" value="#{value}">
+                            #{
+                                ("<option>#{option}</option>" for option in def.type[6..].split ', ').join '\n'
+                            }
+                        </select>
+                    </div>
+                </div>
+            """
+
+onSetParamFieldFocus = ->
+    $(@).removeClass 'invalid'
+
+onSetParamSubmit = ->
+    id = $('#dialog-set-param').data 'id'
+    layer = app.canvas.layers[id]
+
+    valid = true
+
+    for name, def of getLayerParams layer.type
+        v = do $("##{name}").val
+
+        continue if v is ''
+
+        try
+            v = parseType def.type, v
+        catch e
+            $("##{name}").addClass 'invalid'
+            console.log e
+            valid = false
+            continue
+
+        if msg = def.check? v
+            $("##{name}").addClass 'invalid'
+            console.log msg
+            valid = false
+            continue
+
+        layer[name] = v
+
+    if valid
+        $('#dialog-set-param').modal 'hide'
+
+parseType = (type, value) ->
+    switch type
+        when 'integer'
+            value = parseInt value
+            throw 'not an integer' if isNaN value
+        when 'number'
+            value = parseFloat value
+            throw 'not a number' if isNaN value
+        when 'size'
+            value = value.match /\d+/g
+            throw 'not a valid size expression' if not value?
+            value = value.map (x) -> parseInt x
+
+    value
+$ ->
+    $('#dialog-set-param-submit').click onSetParamSubmit
+    $("#dialog-set-param input").on 'focus', onSetParamFieldFocus
