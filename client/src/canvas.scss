@@ -5,6 +5,7 @@
     overflow-y: auto;
     border-right: solid #e7e7e7 1px;
     background-color: #f8f8f8;
+    padding-top: 5px;
 }
 
 .toolbox-item {
@@ -12,6 +13,14 @@
     width: 50%;
     padding: 20px 0;
     text-align: center;
+}
+
+.toolbox-delimiter {
+    clear: both;
+    width: 100%;
+    height: 20px;
+    font-size: 16px;
+    padding-left: 10px;
 }
 
 .canvas {
@@ -99,7 +108,7 @@
 .level {
     height: 100px;
     margin: 0;
-    padding: 20px;
+    padding: 15px;
     text-align: center;
 }
 

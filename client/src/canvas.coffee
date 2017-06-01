@@ -16,16 +16,31 @@ loadCanvasFramework = ->
     do renderConnections
 
 fillToolbox = ->
-    for layer in do getLayerList
-        {input, output} = getLayerInfo layer
-
-        node = renderNode layer, input, output, layer
-            .on 'dragstart', onToolboxLayerDragStart
-            .on 'dragend', destroyDraggingOverlay
-
-        $("<div class='toolbox-item'></div>")
-            .append node
+    for category in ["io", "core", "convolution"]
+        $("<div class='toolbox-delimiter'>#{category}</div>")
             .appendTo $('.toolbox')
+
+        for name, def of layerInfo when def.category is category
+            node = renderNode name, def.input, def.output, name
+                .on 'dragstart', onToolboxLayerDragStart
+                .on 'dragend', destroyDraggingOverlay
+
+            $("<div class='toolbox-item'></div>")
+                .append node
+                .appendTo $('.toolbox')
+
+    for category in ["activation"]
+        $("<div class='toolbox-delimiter'>#{category}</div>")
+            .appendTo $('.toolbox')
+
+        for name, def of pluginInfo when def.category is category
+            node = renderPlugin name
+                .on 'dragstart', -> console.log "fuck"
+                .on 'dragstart', onToolboxPluginDragStart
+
+            $("<div class='toolbox-item'></div>")
+                .append node
+                .appendTo $('.toolbox')
 
 fillCanvasNodes = ->
     for level in app.canvas.positions
@@ -64,6 +79,23 @@ fillCanvasNodes = ->
 onToolboxLayerDragStart = (e) ->
     e.originalEvent.dataTransfer.setData 'application/json', JSON.stringify {type: $(@).data 'id'}
     do triggerDraggingOverlay
+
+onToolboxPluginDragStart = (e) ->
+    e.originalEvent.dataTransfer.setData 'application/json', JSON.stringify {type: 'plugin', id: $(@).data 'id'}
+
+onCanvasNodeDrop = (e) ->
+    {type, id} = JSON.parse e.originalEvent.dataTransfer.getData 'application/json'
+    return if type isnt 'plugin'
+
+    def = getPluginInfo id
+
+    layer = app.canvas.layers[$(@).data 'id']
+
+    layer.plugins ?= []
+    layer.plugins = layer.plugins.filter (x) -> getPluginInfo(x.type).category isnt def.category
+    layer.plugins.push {type: id}
+
+    renderPluginForCanvasNode @
 
 onOverlayDrop = (e) ->
     data = JSON.parse e.originalEvent.dataTransfer.getData 'application/json'
@@ -240,6 +272,12 @@ renderNode = (name, input, output, id) ->
             </ol>
         </div>
     """
+
+renderPlugin = (name) ->
+    def = getPluginInfo name
+
+    $("<div class='plugin' data-id='#{name}'></div>")
+        .append do def.render
 
 onInputPinDragStart = (e) ->
     {id, index} = do $(@).data

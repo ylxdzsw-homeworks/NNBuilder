@@ -1,5 +1,6 @@
 layerInfo =
     Affine:
+        category: 'core'
         input: 1
         output: 1
         params:
@@ -9,6 +10,7 @@ layerInfo =
                 check: (x) ->
                     return "Affine layer must have positive number of units" if x < 0
     Conv:
+        category: 'convolution'
         input: 1
         output: 1
         params:
@@ -19,6 +21,7 @@ layerInfo =
                 description: "kernel stride"
                 type: 'size'
     Pool:
+        category: 'convolution'
         input: 1
         output: 1
         params:
@@ -32,14 +35,17 @@ layerInfo =
                 description: "aggregate function"
                 type: 'enum: max, mean'
     Flat:
+        category: 'convolution'
         input: 1
         output: 1
         params: {}
     Softmax:
+        category: 'core'
         input: 1
         output: 1
         params: {}
     Input:
+        category: 'io'
         input: 0
         output: 1
         params:
@@ -49,6 +55,7 @@ layerInfo =
                 check: (x) ->
                     return "input index must be positive" if x < 0
     Output:
+        category: 'io'
         input: 1
         output: 0
         params: {}
@@ -128,3 +135,45 @@ getOptimizerList = -> k for k of optimizerInfo
 
 getOptimizerInfo = (name) ->
     optimizerInfo[name] ? throw "no such a optimizer: #{name}"
+
+pluginInfo =
+    sigmoid:
+        category: 'activation'
+        render: ->
+            $ """
+                <svg class="img-circle" draggable="true" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+                    <g>
+                        <rect x="0" y="0" width="16" height="16" id="background" fill="#fcc"/>
+                        <path d="M2 8 C 8 8, 8 2, 14 2" stroke="#222" stroke-width="1" fill="none"/>
+                    </g>
+                </svg>
+            """
+    tanh:
+        category: 'activation'
+        render: ->
+            $ """
+                <svg class="img-circle" draggable="true" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+                    <g>
+                        <rect x="0" y="0" width="16" height="16" id="background" fill="#fcc"/>
+                        <path d="M2 14 C 12 14, 4 2, 14 2" stroke="#222" stroke-width="1" fill="none"/>
+                    </g>
+                </svg>
+            """
+    relu:
+        category: 'activation'
+        render: ->
+            $ """
+                <svg class="img-circle" draggable="true" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+                    <g>
+                        <rect x="0" y="0" width="16" height="16" id="background" fill="#fcc"/>
+                        <path d="M2 8 L 8 8 L 14 2" stroke="#222" stroke-width="1" fill="none"/>
+                    </g>
+                </svg>
+            """
+
+getPluginList = -> k for k of pluginInfo
+
+getActivationList = -> k for k, v of pluginInfo when v.category is 'activation'
+
+getPluginInfo = (name) ->
+    pluginInfo[name] ? throw "no such a plugin: #{name}"
