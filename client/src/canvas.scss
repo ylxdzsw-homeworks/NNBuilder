@@ -48,6 +48,11 @@
         .plugin-list {
             margin: 0;
             padding: 0;
+            max-height: 16px;
+
+            .plugin {
+                margin-top: 1px;
+            }
         }
     }
 
@@ -130,4 +135,11 @@
 
 .canvas_background {
     position: absolute;
+}
+
+.plugin {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
 }

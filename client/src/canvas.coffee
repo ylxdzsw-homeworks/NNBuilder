@@ -1,4 +1,4 @@
-loadCanvasFramework = ->
+loadCanvasFramework = (board='model') ->
     $('#main').html """
         <div class="toolbox"></div>
         <div class="canvas">
@@ -10,7 +10,7 @@ loadCanvasFramework = ->
         .on 'dragover', preventDefault
         .on 'drop', destroyDraggingOverlay
 
-    app.canvas = app.model.model
+    app.canvas = app.model[board]
     do fillToolbox
     do fillCanvasNodes
     do renderConnections
@@ -35,7 +35,6 @@ fillToolbox = ->
 
         for name, def of pluginInfo when def.category is category
             node = renderPlugin name
-                .on 'dragstart', -> console.log "fuck"
                 .on 'dragstart', onToolboxPluginDragStart
 
             $("<div class='toolbox-item'></div>")
@@ -53,6 +52,8 @@ fillCanvasNodes = ->
             node = renderNode layer.type, input, output, layer.id
                 .on 'dragstart', onCanvasLayerDragStart
                 .on 'dblclick', onCanvasNodeDoubleClick
+                .on 'dragover', preventDefault
+                .on 'drop', onCanvasNodeDrop
 
             $('.input-item', node)
                 .on 'dragstart', stopPropagation
@@ -69,6 +70,8 @@ fillCanvasNodes = ->
                 .on 'dragend', onOutputPinDragEnd
                 .on 'dragover', preventDefault
                 .on 'drop', onOutputPinDrop
+
+            renderPluginForCanvasNode node
 
             $("<div class='cell'></div>")
                 .append node
@@ -96,6 +99,22 @@ onCanvasNodeDrop = (e) ->
     layer.plugins.push {type: id}
 
     renderPluginForCanvasNode @
+    do renderConnections
+
+renderPluginForCanvasNode = (node) ->
+    list = $('.plugin-list', node)
+    do list.empty
+
+    layer = app.canvas.layers[$(node).data 'id']
+
+    for plugin in layer.plugins ? []
+        plugin = renderPlugin plugin.type
+            .on 'dragstart', stopPropagation
+            .on 'dragstart', onCanvasPluginDragStart
+
+        $("<li class='plugin'></li>")
+            .append plugin
+            .appendTo list
 
 onOverlayDrop = (e) ->
     data = JSON.parse e.originalEvent.dataTransfer.getData 'application/json'
@@ -112,6 +131,8 @@ onOverlayDrop = (e) ->
     node = renderNode layer.type, input, output, layer.id
         .on 'dragstart', onCanvasLayerDragStart
         .on 'dblclick', onCanvasNodeDoubleClick
+        .on 'dragover', preventDefault
+        .on 'drop', onCanvasNodeDrop
 
     $('.input-item', node)
         .on 'dragstart', stopPropagation
@@ -154,6 +175,17 @@ onOverlayDrop = (e) ->
     do renderConnections
     do destroyDraggingOverlay
     do clearDeadLayers
+
+onCanvasPluginDragStart = (e) ->
+    e.originalEvent.dataTransfer.setData 'application/json', JSON.stringify {type: 'plugin', id: $(@).data 'id'}
+    node = $(@).closest('.node')
+    layer = app.canvas.layers[node.data 'id']
+
+    layer.plugins = layer.plugins.filter (x) => x.type isnt $(@).data 'id'
+
+    setImmediate ->
+        renderPluginForCanvasNode node
+        do renderConnections
 
 onCanvasLayerDragStart = (e) ->
     id = $(@).data 'id'
@@ -276,8 +308,11 @@ renderNode = (name, input, output, id) ->
 renderPlugin = (name) ->
     def = getPluginInfo name
 
-    $("<div class='plugin' data-id='#{name}'></div>")
-        .append do def.render
+    $ """
+        <div class="plugin" data-id="#{name}" draggable="true"
+             style="background-image: url('/static/#{name}.svg');">
+        </div>
+    """
 
 onInputPinDragStart = (e) ->
     {id, index} = do $(@).data

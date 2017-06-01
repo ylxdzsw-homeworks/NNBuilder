@@ -38,6 +38,11 @@ gulp.task('lib', function() {
         .pipe(gulp.dest('build'))
 })
 
+gulp.task('svg', function() {
+    return gulp.src('src/svg/*')
+        .pipe(gulp.dest('build'))
+})
+
 gulp.task('browser-sync', function() {
     browserSync({
         proxy: 'localhost:8000',
@@ -60,7 +65,7 @@ gulp.task('clean', function(cb) {
     del(['build']).then(paths => cb())
 })
 
-gulp.task('build', ['views', 'lib'], function() {
+gulp.task('build', ['views', 'lib', 'svg'], function() {
     production && setTimeout(()=>console.info("build complete~"), 0)
 })
 

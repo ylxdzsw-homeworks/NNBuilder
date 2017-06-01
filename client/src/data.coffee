@@ -9,6 +9,7 @@ layerInfo =
                 type: 'integer'
                 check: (x) ->
                     return "Affine layer must have positive number of units" if x < 0
+        plugins: ['activation']
     Conv:
         category: 'convolution'
         input: 1
@@ -20,6 +21,7 @@ layerInfo =
             stride:
                 description: "kernel stride"
                 type: 'size'
+        plugins: ['activation']
     Pool:
         category: 'convolution'
         input: 1
@@ -136,40 +138,65 @@ getOptimizerList = -> k for k of optimizerInfo
 getOptimizerInfo = (name) ->
     optimizerInfo[name] ? throw "no such a optimizer: #{name}"
 
+processInfo =
+    IDX:
+        category: 'source'
+        input: 0
+        output: 1
+        params:
+            file:
+                description: "path to file"
+                type: 'file'
+    HDF5:
+        category: 'source'
+        input: 0
+        output: 1
+        params:
+            variable:
+                description: "variable name"
+                type: 'symbol'
+            file:
+                description: "path to file"
+                type: 'file'
+    Flat:
+        category: 'reshape'
+        input: 1
+        output: 1
+        params: {}
+    Normalization:
+        category: 'transform'
+        input: 1
+        output: 1
+        params:
+            func:
+                description: "function used to normalize"
+                type: 'enum: standardize, scale'
+            dim:
+                description: "normalize along with specific dimension (start from 1)"
+                type: 'size'
+    X:
+        category: 'output'
+        input: 1
+        output: 0
+        params:
+            index:
+                description: "the index of the output"
+                type: 'integer'
+                check: (x) ->
+                    return "output index must be positive" if x < 0
+    Y:
+        category: 'output'
+        input: 1
+        output: 0
+        params: {}
+
 pluginInfo =
     sigmoid:
         category: 'activation'
-        render: ->
-            $ """
-                <svg class="img-circle" draggable="true" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
-                    <g>
-                        <rect x="0" y="0" width="16" height="16" id="background" fill="#fcc"/>
-                        <path d="M2 8 C 8 8, 8 2, 14 2" stroke="#222" stroke-width="1" fill="none"/>
-                    </g>
-                </svg>
-            """
     tanh:
         category: 'activation'
-        render: ->
-            $ """
-                <svg class="img-circle" draggable="true" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
-                    <g>
-                        <rect x="0" y="0" width="16" height="16" id="background" fill="#fcc"/>
-                        <path d="M2 14 C 12 14, 4 2, 14 2" stroke="#222" stroke-width="1" fill="none"/>
-                    </g>
-                </svg>
-            """
     relu:
         category: 'activation'
-        render: ->
-            $ """
-                <svg class="img-circle" draggable="true" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
-                    <g>
-                        <rect x="0" y="0" width="16" height="16" id="background" fill="#fcc"/>
-                        <path d="M2 8 L 8 8 L 14 2" stroke="#222" stroke-width="1" fill="none"/>
-                    </g>
-                </svg>
-            """
 
 getPluginList = -> k for k of pluginInfo
 
