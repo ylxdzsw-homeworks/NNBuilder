@@ -27,10 +27,10 @@ newModel = ->
         epoch: 5
         batch: 64
         loss: 'categorical_crossentropy'
-        metrics: ['accuracy']
-        optimizer:
-            type: 'SGD'
-            lr: 0.1
+        optimizer: 'SGD'
+        momentum: 0.9
+        decay: 0
+        lr: 0.1
 
 saveCheckPoint = (cb=->) ->
     if not app.model?
@@ -61,6 +61,7 @@ navTrain = ->
 
     $('.nav>li').removeClass 'active'
     $('#nav-train').addClass 'active'
+    do loadTrainView
 
 showToast = do ->
     done = ->
