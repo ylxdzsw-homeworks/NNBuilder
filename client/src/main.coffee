@@ -19,7 +19,7 @@ newModel = ->
         layers: {}
         positions: []
         connections: []
-    processing:
+    data:
         layers: {}
         positions: []
         connections: []
@@ -46,7 +46,7 @@ navModel = ->
 
     $('.nav>li').removeClass 'active'
     $('#nav-model').addClass 'active'
-    do loadCanvasFramework
+    loadCanvasFramework 'model'
 
 navData = ->
     if not app.model?
@@ -54,6 +54,7 @@ navData = ->
 
     $('.nav>li').removeClass 'active'
     $('#nav-data').addClass 'active'
+    loadCanvasFramework 'data'
 
 navTrain = ->
     if not app.model?

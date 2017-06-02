@@ -1,4 +1,4 @@
-loadCanvasFramework = (board='model') ->
+loadCanvasFramework = (board) ->
     $('#main').html """
         <div class="toolbox"></div>
         <div class="canvas">
@@ -11,35 +11,56 @@ loadCanvasFramework = (board='model') ->
         .on 'drop', destroyDraggingOverlay
 
     app.canvas = app.model[board]
-    do fillToolbox
+    fillToolbox board
     do fillCanvasNodes
     do renderConnections
 
-fillToolbox = ->
-    for category in ["io", "core", "convolution"]
-        $("<div class='toolbox-delimiter'>#{category}</div>")
-            .appendTo $('.toolbox')
-
-        for name, def of layerInfo when def.category is category
-            node = renderNode name, def.input, def.output, name
-                .on 'dragstart', onToolboxLayerDragStart
-                .on 'dragend', destroyDraggingOverlay
-
-            $("<div class='toolbox-item'></div>")
-                .append node
+fillToolbox = (board) ->
+    if board is 'model'
+        for category in ["io", "core", "convolution"]
+            $("<div class='toolbox-delimiter'>#{category}</div>")
                 .appendTo $('.toolbox')
 
-    for category in ["activation"]
-        $("<div class='toolbox-delimiter'>#{category}</div>")
-            .appendTo $('.toolbox')
+            for layer in getLayerList category
+                {input, output} = getLayerInfo layer
 
-        for name, def of pluginInfo when def.category is category
-            node = renderPlugin name
-                .on 'dragstart', onToolboxPluginDragStart
+                node = renderNode layer, input, output, layer
+                    .on 'dragstart', onToolboxLayerDragStart
+                    .on 'dragend', destroyDraggingOverlay
 
-            $("<div class='toolbox-item'></div>")
-                .append node
+                $("<div class='toolbox-item'></div>")
+                    .append node
+                    .appendTo $('.toolbox')
+
+        for category in ["activation"]
+            $("<div class='toolbox-delimiter'>#{category}</div>")
                 .appendTo $('.toolbox')
+
+            for plugin in getPluginList category
+                node = renderPlugin plugin
+                    .on 'dragstart', onToolboxPluginDragStart
+
+                $("<div class='toolbox-item'></div>")
+                    .append node
+                    .appendTo $('.toolbox')
+
+    else if board is 'data'
+        for category in ["source", "output", "reshape", "transform"]
+            $("<div class='toolbox-delimiter'>#{category}</div>")
+                .appendTo $('.toolbox')
+
+            for layer in getLayerList category
+                {input, output} = getLayerInfo layer
+
+                node = renderNode layer, input, output, layer
+                    .on 'dragstart', onToolboxLayerDragStart
+                    .on 'dragend', destroyDraggingOverlay
+
+                $("<div class='toolbox-item'></div>")
+                    .append node
+                    .appendTo $('.toolbox')
+    else
+        throw 'fuck'
 
 fillCanvasNodes = ->
     for level in app.canvas.positions
@@ -224,7 +245,7 @@ makeIdFor = do ->
     (layer) ->
         loop
             id = gen layer.type
-            if id not of app.model.model.layers and id not of app.model.processing.layers
+            if id not of app.model.model.layers and id not of app.model.data.layers
                 layer.id = id
                 return layer
 
@@ -412,6 +433,24 @@ renderParam = (name, def, value='') ->
                     <label class="col-sm-2 control-label" for="#{name}">#{name}</label>
                     <div class="col-sm-9">
                         <input type="number" class="form-control" id="#{name}" value="#{value}" />
+                    </div>
+                </div>
+            """
+        when 'file'
+            """
+                <div class="form-group">
+                    <label class="col-sm-2 control-label" for="#{name}">#{name}</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" id="#{name}" value="#{value}" />
+                    </div>
+                </div>
+            """
+        when 'symbol'
+            """
+                <div class="form-group">
+                    <label class="col-sm-2 control-label" for="#{name}">#{name}</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" id="#{name}" value="#{value}" />
                     </div>
                 </div>
             """

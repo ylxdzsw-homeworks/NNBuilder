@@ -62,7 +62,58 @@ layerInfo =
         output: 0
         params: {}
 
-getLayerList = -> k for k of layerInfo
+    IDX:
+        category: 'source'
+        input: 0
+        output: 1
+        params:
+            file:
+                description: "path to file"
+                type: 'file'
+    HDF5:
+        category: 'source'
+        input: 0
+        output: 1
+        params:
+            variable:
+                description: "variable name"
+                type: 'symbol'
+            file:
+                description: "path to file"
+                type: 'file'
+    Flatten:
+        category: 'reshape'
+        input: 1
+        output: 1
+        params: {}
+    Normal:
+        category: 'transform'
+        input: 1
+        output: 1
+        params:
+            func:
+                description: "function used to normalize"
+                type: 'enum: standardize, scale'
+            dim:
+                description: "normalize along with specific dimension (start from 1)"
+                type: 'size'
+    X:
+        category: 'output'
+        input: 1
+        output: 0
+        params:
+            index:
+                description: "the index of the output"
+                type: 'integer'
+                check: (x) ->
+                    return "output index must be positive" if x < 0
+    Y:
+        category: 'output'
+        input: 1
+        output: 0
+        params: {}
+
+getLayerList = (category) -> k for k, v of layerInfo when v.category is category
 
 getLayerInfo = (name) ->
     layerInfo[name] ? throw "no such a layer: #{name}"
@@ -138,58 +189,6 @@ getOptimizerList = -> k for k of optimizerInfo
 getOptimizerInfo = (name) ->
     optimizerInfo[name] ? throw "no such a optimizer: #{name}"
 
-processInfo =
-    IDX:
-        category: 'source'
-        input: 0
-        output: 1
-        params:
-            file:
-                description: "path to file"
-                type: 'file'
-    HDF5:
-        category: 'source'
-        input: 0
-        output: 1
-        params:
-            variable:
-                description: "variable name"
-                type: 'symbol'
-            file:
-                description: "path to file"
-                type: 'file'
-    Flat:
-        category: 'reshape'
-        input: 1
-        output: 1
-        params: {}
-    Normalization:
-        category: 'transform'
-        input: 1
-        output: 1
-        params:
-            func:
-                description: "function used to normalize"
-                type: 'enum: standardize, scale'
-            dim:
-                description: "normalize along with specific dimension (start from 1)"
-                type: 'size'
-    X:
-        category: 'output'
-        input: 1
-        output: 0
-        params:
-            index:
-                description: "the index of the output"
-                type: 'integer'
-                check: (x) ->
-                    return "output index must be positive" if x < 0
-    Y:
-        category: 'output'
-        input: 1
-        output: 0
-        params: {}
-
 pluginInfo =
     sigmoid:
         category: 'activation'
@@ -198,9 +197,7 @@ pluginInfo =
     relu:
         category: 'activation'
 
-getPluginList = -> k for k of pluginInfo
-
-getActivationList = -> k for k, v of pluginInfo when v.category is 'activation'
+getPluginList = (category) -> k for k, v of pluginInfo when v.category is category
 
 getPluginInfo = (name) ->
     pluginInfo[name] ? throw "no such a plugin: #{name}"
