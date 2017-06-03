@@ -1,7 +1,20 @@
 #!/usr/bin/env julia
 
+include("../server/model/main.jl")
+include("../server/data/main.jl")
 include("../server/web/main.jl")
 
-@async run(Server(root), host=ip"0.0.0.0", port=try parse(Int, ARGS[1]) catch 8000 end)
+using Fire
 
-isinteractive() || wait()
+@main function main(service::Symbol=:all)
+    service in (:model, :all) && schedule(model_service)
+
+    println("fuck")
+
+    service in (:data,  :all) && schedule(data_service)
+    println("fuck")
+    service in (:web,   :all) && schedule(web_service)
+    println("fuck")
+
+    isinteractive() || wait()
+end

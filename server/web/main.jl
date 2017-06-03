@@ -1,3 +1,5 @@
+module NNBuilder_Web
+
 using HttpServer
 using RedisAlchemy
 using Restful
@@ -25,3 +27,11 @@ include("static_assets.jl")
 include("redis_proxy.jl")
 include("projects.jl")
 include("models.jl")
+
+function main()
+    run(Server(root), host=ip"0.0.0.0", port=8000)
+end
+
+end # module
+
+web_service = Task(NNBuilder_Web.main)

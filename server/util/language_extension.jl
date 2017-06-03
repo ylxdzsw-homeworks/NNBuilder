@@ -24,18 +24,19 @@ const project_root = normpath(Base.source_dir(), "..", "..")
 
 macro abs_str(x) isinteractive() ? x : joinpath(project_root, split(x, '/')...) end
 
-import Base: <<, >>, >>>
-
 <<(x::IO, y) = (print(x, y); x)
 <<(x::IO, y::Byte) = (write(x, y); x)
 <<(x::IO, y::Bytes) = (write(x, y); x)
 <<(x::IO, f::Function) = (f(x); x)
+<<(x, y) = Base.<<(x, y)
 
 >>(x::IO, y) = read(x, y)
 >>(x::IO, f::Function) = f(x)
+>>(x, y) = Base.>>(x, y)
 
 >>>(x::IO, y) = (read(x, y); x)
 >>>(x::IO, f::Function) = (f(x); x)
+>>>(x, y) = Base.>>>(x, y)
 
 prt(xs...) = prt(STDOUT, xs...)
 prt(io::IO, xs...) = begin
