@@ -41,9 +41,9 @@ loadTrainView = ->
                     <label for="lr">Learning Rate</label>
                     <input type="number" class="form-control" id="lr" value="#{app.model.train.lr}" />
                 </div>
-
-                <button type="submit" class="btn btn-primary train-setting-submit">Submit</button>
             </form>
+
+            <button type="submit" class="btn btn-primary train-submit">提交任务</button>
         </div>
         <div class="col-md-7">
             <h3> 运行日志 </h3>
@@ -70,6 +70,8 @@ loadTrainView = ->
     $('#epoch').on 'blur', onEpochSet
     $('#batch').on 'blur', onBatchSet
     $('#lr').on 'blur', onLearningRateSet
+
+    $('.train-submit').on 'click', onTrainSubmit
 
     do renderOptimizerOptions
 
@@ -105,6 +107,11 @@ onOptimizerFieldSet = ->
         return
 
     app.model.train[@id] = parseFloat @value
+
+onTrainSubmit = ->
+    $.post url: "/tasks", data: JSON.stringify app.model
+        .fail showError
+        .done () -> showToast 'yeah'
 
 renderOptimizerOptions = ->
     do $('.optimizer-field').remove

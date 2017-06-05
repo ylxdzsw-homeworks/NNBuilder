@@ -21,6 +21,9 @@ layerInfo =
             stride:
                 description: "kernel stride"
                 type: 'size'
+            padding:
+                description: "padding style"
+                type: 'enum: same, valid'
         plugins: ['activation']
     Pool:
         category: 'convolution'

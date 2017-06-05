@@ -8,13 +8,8 @@ using Fire
 
 @main function main(service::Symbol=:all)
     service in (:model, :all) && schedule(model_service)
-
-    println("fuck")
-
     service in (:data,  :all) && schedule(data_service)
-    println("fuck")
     service in (:web,   :all) && schedule(web_service)
-    println("fuck")
 
     isinteractive() || wait()
 end

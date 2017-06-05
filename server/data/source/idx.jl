@@ -19,3 +19,7 @@ function read_idx(filename)
     result = read(f, t, reverse(dims)...)
     permutedims(result, dim:-1:1)
 end
+
+function dispatch(::Val{:IDX}; file="")
+    (read_idx(file),)
+end

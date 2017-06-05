@@ -29,7 +29,7 @@ end
     :PUT | json => begin
         @destruct name
         id = try parse(Int, id) catch return 404 end
-        idx = findfirst(x->JSON.parse(x)["id"]==id, db_projects)
+        idx = findfirst(x->JSON.parse(x)["id"]==id, db_projects[:])
         idx == 0 || return 404
         db_projects[idx] = json"{name: $name, id: $id}"
         200
@@ -37,7 +37,7 @@ end
 
     :DELETE => begin
         id = try parse(Int, id) catch return 404 end
-        idx = findfirst(x->JSON.parse(x)["id"]==id, db_projects)
+        idx = findfirst(x->JSON.parse(x)["id"]==id, db_projects[:])
         idx == 0 || return 404
         db_projects[idx] = "__deleted__"
         exec(db_projects, "lrem", 1, "__deleted__")

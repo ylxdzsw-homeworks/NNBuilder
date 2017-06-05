@@ -27,6 +27,7 @@ include("static_assets.jl")
 include("redis_proxy.jl")
 include("projects.jl")
 include("models.jl")
+include("tasks.jl")
 
 function main()
     run(Server(root), host=ip"0.0.0.0", port=8000)

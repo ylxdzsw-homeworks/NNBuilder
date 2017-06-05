@@ -10,14 +10,43 @@ include("../util/language_extension.jl")
 
 set_default_redis_connection(RedisConnectionPool())
 
-const db_uid = RedisCounter("uid")
-const db_task = RedisBlockedQueue{String}("data_task")
+const cache_dir = abs"data/cache"
+mkpath(cache_dir)
 
-include("dispatch.jl")
+const db_uid = RedisCounter("uid")
+const db_data_wait = RedisBlockedQueue{String}("data_wait")
+const db_model_wait = RedisBlockedQueue{String}("model_wait")
+const db_task_ongoing = RedisList{String}("data_task_ongoing")
+const db_task_def = RedisDict{String, String}("task_def")
+
+include("graph.jl")
+
+include("output/X.jl")
+include("output/Y.jl")
+
+include("reshape/flatten.jl")
+
+include("source/hdf5.jl")
+include("source/idx.jl")
+
+include("transform/normal.jl")
 
 function main()
     while true
-        yield()
+        # 1. retrive task
+        task_id = dequeue!(db_data_wait)
+        push!(db_task_ongoing, task_id)
+        info("[data $(now())]: $task_id started")
+
+        # 2. run task
+        def = db_task_def[task_id] |> JSON.parse
+        graph = load_graph(def["data"])
+        eval_graph(graph, task_id)
+
+        # 3. report task
+        info("[data $(now())]: $task_id finished")
+        enqueue!(db_model_wait, task_id)
+        exec(db_task_ongoing, "lrem", 1, task_id)
     end
 end
 
