@@ -115,6 +115,18 @@ onProjectSelected = ->
             do navModel
             $('#dialog-load-project').modal 'hide'
 
+downloadAs = (filename, text) ->
+    a = $('<a></a>')
+        .attr 'href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text)
+        .attr 'download', filename
+    do a[0].click
+
+exportModel = ->
+    if not app.model?
+        return #TODO
+
+    downloadAs "model.json", JSON.stringify app.model
+
 $ ->
     $('#dialog-new-project-submit').click onNewProjectSubmit
     $('#dialog-load-project').on 'show.bs.modal', onLoadProjectShow
@@ -124,3 +136,5 @@ $ ->
     $('#nav-train').click navTrain
 
     $('#nav-menu-save').click -> saveCheckPoint -> showToast "保存成功"
+
+    $('#nav-menu-export').click -> exportModel

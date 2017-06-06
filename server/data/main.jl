@@ -16,7 +16,7 @@ mkpath(cache_dir)
 const db_uid = RedisCounter("uid")
 const db_data_wait = RedisBlockedQueue{String}("data_wait")
 const db_model_wait = RedisBlockedQueue{String}("model_wait")
-const db_task_ongoing = RedisList{String}("data_task_ongoing")
+const db_data_ongoing = RedisList{String}("data_ongoing")
 const db_task_def = RedisDict{String, String}("task_def")
 
 include("graph.jl")
@@ -30,12 +30,13 @@ include("source/hdf5.jl")
 include("source/idx.jl")
 
 include("transform/normal.jl")
+include("transform/onehot.jl")
 
 function main()
     while true
         # 1. retrive task
         task_id = dequeue!(db_data_wait)
-        push!(db_task_ongoing, task_id)
+        push!(db_data_ongoing, task_id)
         info("[data $(now())]: $task_id started")
 
         # 2. run task
@@ -46,7 +47,7 @@ function main()
         # 3. report task
         info("[data $(now())]: $task_id finished")
         enqueue!(db_model_wait, task_id)
-        exec(db_task_ongoing, "lrem", 1, task_id)
+        exec(db_data_ongoing, "lrem", 1, task_id)
     end
 end
 

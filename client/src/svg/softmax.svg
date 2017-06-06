@@ -1,0 +1,6 @@
+<svg width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+    <g>
+        <rect x="0" y="0" width="16" height="16" id="background" fill="#fcc"/>
+        <text xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="12" x="5" y="10" stroke-width="0.8" stroke="#000">p</text>
+    </g>
+</svg>

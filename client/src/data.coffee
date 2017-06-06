@@ -15,6 +15,11 @@ layerInfo =
         input: 1
         output: 1
         params:
+            n:
+                description: "number of kernels"
+                type: 'integer'
+                check: (x) ->
+                    return "kernel numbers must be positive" if x < 0
             kernel:
                 description: "kernel size"
                 type: 'size'
@@ -36,16 +41,14 @@ layerInfo =
             stride:
                 description: "kernel stride"
                 type: 'size'
+            padding:
+                description: "padding style"
+                type: 'enum: same, valid'
             func:
                 description: "aggregate function"
                 type: 'enum: max, mean'
     Flat:
         category: 'convolution'
-        input: 1
-        output: 1
-        params: {}
-    Softmax:
-        category: 'core'
         input: 1
         output: 1
         params: {}
@@ -100,6 +103,11 @@ layerInfo =
             dim:
                 description: "normalize along with specific dimension (start from 1)"
                 type: 'size'
+    OneHot:
+        category: 'transform'
+        input: 1
+        output: 1
+        params: {}
     X:
         category: 'output'
         input: 1
@@ -198,6 +206,8 @@ pluginInfo =
     tanh:
         category: 'activation'
     relu:
+        category: 'activation'
+    softmax:
         category: 'activation'
 
 getPluginList = (category) -> k for k, v of pluginInfo when v.category is category
