@@ -20,6 +20,6 @@ function read_idx(filename)
     permutedims(result, dim:-1:1)
 end
 
-function dispatch(::Val{:IDX}; file="")
+function dispatch(::Val{:IDX}; file="", kwargs...)
     (read_idx(file),)
 end
