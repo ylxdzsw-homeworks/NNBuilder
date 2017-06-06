@@ -127,3 +127,9 @@ renderOptimizerOptions = ->
         """
 
         $("##{name}").on 'blur', onOptimizerFieldSet
+
+$ ->
+    check_log = ->
+        return if not $('#nav-train').hasClass 'active'
+        #TODO: goes here
+    setInterval check_log, 1000
