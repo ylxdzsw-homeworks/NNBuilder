@@ -16,7 +16,7 @@ const db_models = RedisList{String}("models")
 
         models = db_models[:]
 
-        if get(req[:query], "all", false)
+        if "all" in keys(req[:query])
             idx = find(x->JSON.parse(x)["project"]==project, models)
             isempty(idx) ? 404 : "[$(join(models[idx], ','))]"
         else
@@ -25,9 +25,10 @@ const db_models = RedisList{String}("models")
         end
     end
 
-    :POST => begin
+    :POST | json => begin
         # TODO: check model
-        push!(db_models, req[:body])
+        model = @json "{timestamp: $(now()), $(req[:body])...}"
+        push!(db_models, model)
         200
     end
 end

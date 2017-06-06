@@ -29,7 +29,7 @@ html
                             li#nav-menu-open: a(href='#', data-toggle='modal', data-target='#dialog-load-project') 打开项目
                             li.divider
                             li#nav-menu-save: a(href='#') 保存检查点
-                            li#nav-menu-load: a(href='#') 读取检查点
+                            li#nav-menu-load: a(href='#', data-toggle='modal', data-target='#dialog-load-model') 读取检查点
                             li.divider
                             li#nav-menu-export: a(href='#') 导出模型
                     li#nav-model.active: a(href='#') 模型
@@ -59,6 +59,17 @@ html
                         h4.modal-title 选择项目
                     .modal-body
                         ul#dialog-load-project-list.list-group
+                    .modal-footer
+                        button.btn.btn-default(type='button', data-dismiss='modal') 返回
+
+        #dialog-load-model.modal.fade
+            .modal-dialog
+                .modal-content
+                    .modal-header
+                        button.close(data-dismiss='modal') &times;
+                        h4.modal-title 选择模型
+                    .modal-body
+                        ul#dialog-load-model-list.list-group
                     .modal-footer
                         button.btn.btn-default(type='button', data-dismiss='modal') 返回
 

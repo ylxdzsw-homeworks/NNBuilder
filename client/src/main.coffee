@@ -115,6 +115,30 @@ onProjectSelected = ->
             do navModel
             $('#dialog-load-project').modal 'hide'
 
+onLoadModelShow = ->
+    $('#dialog-load-model-list').html ''
+    $.get url: '/models', data: project: app.project.id, all: true
+        .fail showError
+        .done (data) ->
+            JSON.parse data
+                .forEach (model) ->
+                    $ "<button class='list-group-item'>#{model.timestamp}</button>"
+                        .data 'model', model
+                        .click onModelSelected
+                        .appendTo '#dialog-load-model-list'
+
+onModelSelected = ->
+    app.model = $(@).data 'model'
+    showToast "读取完毕"
+    switch $('.nav>li.active')[0].id
+        when 'nav-model'
+            do navModel
+        when 'nav-data'
+            do navData
+        when 'nav-train'
+            do navTrain
+    $('#dialog-load-model').modal 'hide'
+
 downloadAs = (filename, text) ->
     a = $('<a></a>')
         .attr 'href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text)
@@ -130,6 +154,7 @@ exportModel = ->
 $ ->
     $('#dialog-new-project-submit').click onNewProjectSubmit
     $('#dialog-load-project').on 'show.bs.modal', onLoadProjectShow
+    $('#dialog-load-model').on 'show.bs.modal', onLoadModelShow
 
     $('#nav-model').click navModel
     $('#nav-data').click navData
