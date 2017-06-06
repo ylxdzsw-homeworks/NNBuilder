@@ -92,6 +92,11 @@ layerInfo =
         input: 1
         output: 1
         params: {}
+    Unsqueeze:
+        category: 'reshape'
+        input: 1
+        output: 1
+        params: {}
     Normal:
         category: 'transform'
         input: 1

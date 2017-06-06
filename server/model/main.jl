@@ -11,6 +11,7 @@ set_default_redis_connection(RedisConnectionPool())
 
 const cache_dir = abs"data/cache"
 const model_dir = abs"data/model"
+mkpath(model_dir)
 
 const db_uid = RedisCounter("uid")
 const db_model_wait = RedisBlockedQueue{String}("model_wait")
@@ -22,6 +23,7 @@ include("graph.jl")
 
 include("keras/wrapper.jl")
 include("keras/dispatch.jl")
+include("keras/train.jl")
 
 function main()
     while true
@@ -32,13 +34,13 @@ function main()
 
         # 2. train model
         def = db_task_def[task_id] |> JSON.parse
-        graph = load_graph(def["data"])
+        graph = load_graph(def)
         eval_graph(graph, task_id)
 
         # 3. report task
         info("[model $(now())]: $task_id finished")
         push!(db_task_done, task_id)
-        exec(db_task_ongoing, "lrem", 1, task_id)
+        exec(db_model_ongoing, "lrem", 1, task_id)
     end
 end
 

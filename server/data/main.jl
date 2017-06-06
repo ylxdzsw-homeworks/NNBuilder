@@ -25,6 +25,7 @@ include("output/X.jl")
 include("output/Y.jl")
 
 include("reshape/flatten.jl")
+include("reshape/unsqueeze.jl")
 
 include("source/hdf5.jl")
 include("source/idx.jl")
