@@ -133,14 +133,18 @@ $ ->
             .done (tasks) ->
                 do $('.task-switch').empty
                 JSON.parse tasks
+                    .map (x) -> parseInt x[4..]
+                    .sort()
+                    .reverse()
+                    .map (x) -> "task#{x}"
                     .forEach (task) ->
                         $ "<option>#{task}</option>"
                             .appendTo '.task-switch'
 
         task_id = $('.task-switch').val()
-        return if task_id is "暂无任务"
+        return if not task_id? or task_id is "暂无任务"
 
-        $.get "/tasks/$task_id"
+        $.get "/tasks/#{task_id}"
             .fail showError
             .done (log) ->
                 $('#main .log').text log

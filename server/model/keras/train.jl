@@ -14,9 +14,13 @@ function train(keras::Val{:Keras}, task_id, inputs, output, setting)
 
     inputs = map(x->car(get(x.cache)), inputs)
 
+    callback = Keras.LambdaCallback(on_epoch_end=(e, logs)->begin
+        db_task_log[task_id] = db_task_log[task_id] * "$e / $epoch epoches - loss: $(logs["loss"])\n"
+    end)
+
     model = Keras.Model(inputs=inputs, outputs=[output])
     model[:compile](optimizer, loss)
-    model[:fit](X, Y, batch_size=batch, epochs=epoch)
+    model[:fit](X, Y, batch_size=batch, epochs=epoch, callbacks=[callback])
     model[:save]("$model_dir/$task_id.h5")
 end
 

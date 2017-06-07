@@ -33,6 +33,7 @@ const db_task_log = RedisDict{String, String}("task_log")
 end
 
 @resource task <: tasks let
+    :mixin => defaultmixin
     :route => "*"
 
     :GET => begin
