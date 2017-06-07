@@ -40,7 +40,7 @@ function main()
         task_id = dequeue!(db_data_wait)
         push!(db_data_ongoing, task_id)
         println(STDERR, "[data $(now())]: $task_id started")
-        db_task_log[task_id] = db_task_log[task_id] * "[$(now())]: 开始进行数据处理\n"
+        db_task_log[task_id] = db_task_log[task_id] * "[$(now())] 开始进行数据处理\n"
 
         # 2. run task
         def = db_task_def[task_id] |> JSON.parse
@@ -49,7 +49,7 @@ function main()
 
         # 3. report task
         println(STDERR, "[data $(now())]: $task_id finished")
-        db_task_log[task_id] = db_task_log[task_id] * "[$(now())]: 数据处理完毕，等待进行训练\n"
+        db_task_log[task_id] = db_task_log[task_id] * "[$(now())] 数据处理完毕，等待进行训练\n"
         enqueue!(db_model_wait, task_id)
         exec(db_data_ongoing, "lrem", 1, task_id)
     end

@@ -521,3 +521,4 @@ parseType = (type, value) ->
 $ ->
     $('#dialog-set-param-submit').click onSetParamSubmit
     $("#dialog-set-param input").on 'focus', onSetParamFieldFocus
+    $(window).on 'resize', renderConnections

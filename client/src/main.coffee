@@ -164,4 +164,4 @@ $ ->
 
     $('#nav-menu-save').click -> saveCheckPoint -> showToast "保存成功"
 
-    $('#nav-menu-export').click -> exportModel
+    $('#nav-menu-export').click exportModel
