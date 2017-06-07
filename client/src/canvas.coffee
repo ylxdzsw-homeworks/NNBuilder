@@ -331,7 +331,8 @@ renderPlugin = (name) ->
 
     $ """
         <div class="plugin" data-id="#{name}" draggable="true"
-             style="background-image: url('/static/#{name}.svg');">
+             style="background-image: url('/static/#{name}.svg');"
+             title="#{name}">
         </div>
     """
 
@@ -414,7 +415,8 @@ renderParam = (name, def, value='') ->
                 <div class="form-group">
                     <label class="col-sm-2 control-label" for="#{name}">#{name}</label>
                     <div class="col-sm-9">
-                        <input type="number" step="1" class="form-control" id="#{name}" value="#{value}" />
+                        <input type="number" step="1" class="form-control" id="#{name}"
+                               value="#{value}" title="#{def.description}" />
                     </div>
                 </div>
             """
@@ -423,7 +425,8 @@ renderParam = (name, def, value='') ->
                 <div class="form-group">
                     <label class="col-sm-2 control-label" for="#{name}">#{name}</label>
                     <div class="col-sm-9">
-                        <input type="text" class="form-control" id="#{name}" value="#{value}" />
+                        <input type="text" class="form-control" id="#{name}"
+                               value="#{value}" title="#{def.description}" />
                     </div>
                 </div>
             """
@@ -432,7 +435,8 @@ renderParam = (name, def, value='') ->
                 <div class="form-group">
                     <label class="col-sm-2 control-label" for="#{name}">#{name}</label>
                     <div class="col-sm-9">
-                        <input type="number" class="form-control" id="#{name}" value="#{value}" />
+                        <input type="number" class="form-control" id="#{name}"
+                               value="#{value}" title="#{def.description}" />
                     </div>
                 </div>
             """
@@ -441,7 +445,8 @@ renderParam = (name, def, value='') ->
                 <div class="form-group">
                     <label class="col-sm-2 control-label" for="#{name}">#{name}</label>
                     <div class="col-sm-9">
-                        <input type="text" class="form-control" id="#{name}" value="#{value}" />
+                        <input type="text" class="form-control" id="#{name}"
+                               value="#{value}" title="#{def.description}" />
                     </div>
                 </div>
             """
@@ -450,7 +455,8 @@ renderParam = (name, def, value='') ->
                 <div class="form-group">
                     <label class="col-sm-2 control-label" for="#{name}">#{name}</label>
                     <div class="col-sm-9">
-                        <input type="text" class="form-control" id="#{name}" value="#{value}" />
+                        <input type="text" class="form-control" id="#{name}"
+                               value="#{value}" title="#{def.description}" />
                     </div>
                 </div>
             """
@@ -461,7 +467,7 @@ renderParam = (name, def, value='') ->
                 <div class="form-group">
                     <label class="col-sm-2 control-label" for="#{name}">#{name}</label>
                     <div class="col-sm-9">
-                        <select class="form-control" id="#{name}" value="#{value}">
+                        <select class="form-control" id="#{name}" value="#{value}" title="#{def.description}">
                             #{
                                 ("<option>#{option}</option>" for option in def.type[6..].split ', ').join '\n'
                             }

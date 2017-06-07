@@ -112,7 +112,7 @@ onSwitchTask = ->
 renderOptimizerOptions = ->
     do $('.optimizer-field').remove
 
-    anchor = $('.train-setting-submit')
+    anchor = $('.train-submit')
 
     for name, info of getOptimizerInfo app.model.train.optimizer
         anchor.before $ """
