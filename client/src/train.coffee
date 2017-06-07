@@ -47,19 +47,10 @@ loadTrainView = ->
         </div>
         <div class="col-md-7">
             <h3> 运行日志 </h3>
+            <select class="form-control task-switch">
+            </select>
             <pre class="log">
-                this is the fucking log
-                this is the fucking log
-                this is the fucking log
-                this is the fucking log
-                this is the fucking log
-                this is the fucking log
-                this is the fucking log
-                this is the fucking log
-                this is the fucking log
-                this is the fucking log
-                this is the fucking log
-                this is the fucking log
+                请在上方选择任务
             </pre>
         </div>
     """
@@ -70,6 +61,8 @@ loadTrainView = ->
     $('#epoch').on 'blur', onEpochSet
     $('#batch').on 'blur', onBatchSet
     $('#lr').on 'blur', onLearningRateSet
+
+    $('.task-switch').on 'change', onSwitchTask
 
     $('.train-submit').on 'click', onTrainSubmit
 
@@ -113,6 +106,9 @@ onTrainSubmit = ->
         .fail showError
         .done () -> showToast 'yeah'
 
+onSwitchTask = ->
+    # TODO
+
 renderOptimizerOptions = ->
     do $('.optimizer-field').remove
 
@@ -131,5 +127,22 @@ renderOptimizerOptions = ->
 $ ->
     check_log = ->
         return if not $('#nav-train').hasClass 'active'
-        #TODO: goes here
+        $.get url: '/tasks', data: project: app.project.id
+            .fail ->
+                $('.task-switch').html "<option>暂无任务</option>"
+            .done (tasks) ->
+                do $('.task-switch').empty
+                JSON.parse tasks
+                    .forEach (task) ->
+                        $ "<option>#{task}</option>"
+                            .appendTo '.task-switch'
+
+        task_id = $('.task-switch').val()
+        return if task_id is "暂无任务"
+
+        $.get "/tasks/$task_id"
+            .fail showError
+            .done (log) ->
+                $('#main .log').text log
+
     setInterval check_log, 1000

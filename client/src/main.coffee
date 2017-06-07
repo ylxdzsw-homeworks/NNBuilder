@@ -111,7 +111,9 @@ onProjectSelected = ->
     $.get url: '/models', data: project: id
         .fail showError
         .done (data) ->
-            app.model = JSON.parse data
+            m = JSON.parse data
+            delete m.timestamp
+            app.model = m
             do navModel
             $('#dialog-load-project').modal 'hide'
 

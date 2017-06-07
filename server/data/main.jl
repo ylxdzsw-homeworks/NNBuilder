@@ -18,6 +18,7 @@ const db_data_wait = RedisBlockedQueue{String}("data_wait")
 const db_model_wait = RedisBlockedQueue{String}("model_wait")
 const db_data_ongoing = RedisList{String}("data_ongoing")
 const db_task_def = RedisDict{String, String}("task_def")
+const db_task_log = RedisDict{String, String}("task_log")
 
 include("graph.jl")
 
@@ -38,7 +39,8 @@ function main()
         # 1. retrive task
         task_id = dequeue!(db_data_wait)
         push!(db_data_ongoing, task_id)
-        info("[data $(now())]: $task_id started")
+        println(STDERR, "[data $(now())]: $task_id started")
+        db_task_log[task_id] = db_task_log[task_id] + "[$(now())]: 开始进行数据处理\n"
 
         # 2. run task
         def = db_task_def[task_id] |> JSON.parse
@@ -46,7 +48,8 @@ function main()
         eval_graph(graph, task_id)
 
         # 3. report task
-        info("[data $(now())]: $task_id finished")
+        println(STDERR, "[data $(now())]: $task_id finished")
+        db_task_log[task_id] = db_task_log[task_id] + "[$(now())]: 数据处理完毕，等待进行训练\n"
         enqueue!(db_model_wait, task_id)
         exec(db_data_ongoing, "lrem", 1, task_id)
     end
